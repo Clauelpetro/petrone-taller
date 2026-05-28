@@ -865,8 +865,11 @@
     function actualizarTodo() {
         const tAutos = document.getElementById("tabla-autos"); tAutos.innerHTML = "";
         let totalDeudasCalle = 0;
-        autos.forEach(a => { totalDeudasCalle += ((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado)); });
-
+        autos.forEach(a => {
+            if (a.entregado === "si" && ((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado)) > 0) {
+                totalDeudasCalle += ((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado));
+            }
+        });
         if (filtroAutosActivo === 'taller') {
             autos.forEach(a => {
                 if (a.entregado === 'si') return;
