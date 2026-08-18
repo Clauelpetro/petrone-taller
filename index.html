@@ -773,26 +773,13 @@
     }
 
     function exportarRespaldo() {
-    const dataStr = JSON.stringify({ autos, histAutos, gastos, historialSemanas, historialMeses, cajaSemanalEntrada, mesActivoTrabajo });
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const nombre = 'backup_taller_' + new Date().toISOString().slice(0,10) + '.json';
-    const archivo = new File([blob], nombre, { type: 'application/json' });
-
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [archivo] })) {
-        navigator.share({
-            title: 'Copia Taller Petrone',
-            files: [archivo]
-        }).catch(() => {});
-    } else {
-        const url = URL.createObjectURL(blob);
-        const enlace = document.createElement('a');
-        enlace.href = url;
-        enlace.download = nombre;
-        enlace.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const dataStr = JSON.stringify({ autos, histAutos, gastos, historialSemanas, historialMeses, cajaSemanalEntrada, mesActivoTrabajo });
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', 'backup_taller_' + new Date().toISOString().slice(0,10) + '.json');
+        linkElement.click();
     }
-}
-    
 
     function importarRespaldo(event) {
         const input = event.target;
