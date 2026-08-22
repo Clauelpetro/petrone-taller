@@ -1,1 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Taller Petrone</title>
+    <link rel="apple-touch-icon" href="icono.png">    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Taller Petrone">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+        }
 
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            /* Evita rebotes raros al hacer scroll en iPhone */
+            overflow-x: hidden; 
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        /* ENCABEZADO CON TU LOGO PROPIO */
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--bg-card);
+            padding-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        header h1 { 
+            margin: 0; 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            color: #fff; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        header h1 span { color: #38bdf8; }
+        header p { 
+            color: var(--text-muted); 
+            margin: 0; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+        }
+
+        .logo-svg {
+            width: 75px;
+            height: auto;
+            filter: drop-shadow(0px 0px 8px rgba(56, 189, 248, 0.5));
+        }
+
+        /* Dashboard KPIs */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 768px) {
+            .dashboard { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .metric-card {
+            background-color: var(--bg-card);
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+        .metric-card.ingresos { border-left-color: var(--success); }
+        .metric-card.gastos { border-left-color: var(--danger); }
+        .metric-card.deudas { border-left-color: var(--warning); }
+
+        .metric-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; display: block; }
+        .metric-subtitle { font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
+        .metric-value { font-size: 1.3rem; font-weight: bold; }
+
+        /* Layout */
+        .grid-main {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 1150px) {
+            .grid-main { grid-template-columns: 360px 1fr; }
+        }
+
+        .panel {
+            background-color: var(--bg-card);
+            padding: 15px;
+            border-radius: 10px;
+            height: fit-content;
+            margin-bottom: 20px;
+        }
+        .panel h2 {
+            margin-top: 0; margin-bottom: 15px; font-size: 1.1rem;
+            border-bottom: 1px solid var(--bg-input); padding-bottom: 8px;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        }
+
+        /* Formulario e Inputs */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: var(--text-muted); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; background-color: var(--bg-input); border: 1px solid #475569; border-radius: 6px; color: white; font-size: 0.95rem; box-sizing: border-box; font-family: inherit; }
+        
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: #475569; color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-purple { background-color: var(--purple); color: white; }
+
+        /* Pestañas Izquierda */
+        .tab-buttons { display: flex; gap: 5px; margin-bottom: 15px; background-color: var(--bg-main); padding: 4px; border-radius: 8px; }
+        .tab-btn { background: transparent; color: var(--text-muted); padding: 8px 5px; font-size: 0.8rem; width: 33.33%; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { background-color: var(--bg-card); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* Pestañas Tablas */
+        .table-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 2px solid var(--bg-input); padding-bottom: 5px; }
+        .table-tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 8px 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px 6px 0 0; }
+        .table-tab-btn.active { background-color: var(--bg-input); color: white; }
+
+        /* Tablas */
+        .table-container { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 10px; }
+        th { background-color: var(--bg-input); padding: 10px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        td { padding: 12px 10px; border-bottom: 1px solid var(--bg-input); font-size: 0.9rem; vertical-align: top; }
+
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .badge.pagado { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge.debe { background-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .badge.parcial { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge.entregado { background-color: rgba(139, 92, 246, 0.2); color: var(--purple); }
+
+        .group-header-row { background-color: rgba(255, 255, 255, 0.03); }
+        .group-header-text { padding: 8px 10px; font-size: 0.85rem; color: var(--warning); font-weight: bold; border-bottom: 1px solid var(--bg-input); }
+
+        .action-container { display: flex; flex-direction: column; gap: 4px; }
+        .action-row { display: flex; gap: 4px; align-items: center; }
+        .action-btn { background: transparent; color: var(--text-muted); width: auto; padding: 6px; border: none; cursor: pointer; border-radius: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; }
+        .action-btn:hover { color: white; background: var(--bg-input); }
+        .action-btn.del:hover { color: var(--danger); }
+        .action-btn.payall:hover { color: var(--success); background: rgba(16, 185, 129, 0.15); }
+        .btn-mini-cobro { font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; background: rgba(16, 185, 129, 0.15); color: var(--success); display: inline-flex; align-items: center; gap: 3px; margin-top: 2px; }
+        .btn-mini-cobro:hover { background: var(--success); color: white; }
+
+        /* IA Insights */
+        .ia-panel { background: linear-gradient(135deg, #1e1b4b 0%, #1e293b 100%); border: 1px solid #4338ca; padding: 12px; border-radius: 10px; margin-bottom: 20px; }
+        .ia-header { display: flex; align-items: center; gap: 8px; color: #818cf8; font-weight: bold; margin-bottom: 8px; font-size: 0.95rem; }
+        .ia-insight { background-color: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; margin-bottom: 5px; font-size: 0.85rem; border-left: 3px solid #818cf8; display: flex; gap: 6px; align-items: center; }
+
+        /* Historiales */
+        .historial-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 768px) { .historial-grid { grid-template-columns: 1fr 1fr; } }
+        .historial-box { background-color: rgba(0,0,0,0.2); border: 1px solid var(--bg-input); padding: 12px; border-radius: 8px; max-height: 250px; overflow-y: auto; }
+        .historial-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px dashed var(--bg-input); }
+
+        /* Buscador Propio e Historial Desplegable */
+        .toggle-btn-historial { background: transparent; color: var(--purple); font-size: 1.1rem; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: bold; width: auto; }
+        .search-container { position: relative; margin-bottom: 15px; width: 100%; }
+        .search-container i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; }
+        .search-container input { padding-left: 35px; background-color: rgba(0, 0, 0, 0.2); }
+
+        /* Modales */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 15px;
+        }
+        .modal-content {
+            background-color: var(--bg-card); padding: 20px; border-radius: 12px; width: 100%; max-width: 420px;
+            border: 1px solid #475569; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-content h3 { margin-top: 0; border-bottom: 1px solid var(--bg-input); padding-bottom: 10px; color: var(--primary); font-size: 1.1rem; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15,38 Q30,22 55,20 Q65,20 75,28 Q88,33 90,38" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M35,24 Q55,21 72,29 Q68,34 50,34 Z" fill="none" stroke="#00d2ff" stroke-width="1.5"/>
+                <path d="M15,38 Q18,45 23,45 Q28,45 30,38 L55,38 Q58,45 63,45 Q68,45 70,38 L88,38" stroke="#0072ff" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <ellipse cx="17" cy="37" rx="3" ry="1" fill="#00d2ff" transform="rotate(-10 17 37)"/>
+                <g transform="translate(80, 15) scale(0.7)">
+                    <path d="M5,2 L15,2 L12,12 L8,12 Z" fill="#0072ff" stroke="#ffffff" stroke-width="1"/>
+                    <path d="M10,12 L10,18 L5,22 M10,15 L14,15" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M5,22 Q12,25 18,20" stroke="#00d2ff" stroke-width="1.5" fill="none"/>
+                </g>
+            </svg>
+            <h1>TALLER <span>PETRONE</span></h1>
+        </div>
+        <p>Chapa y Pintura</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="metric-card ingresos">
+            <span class="metric-title">Esta Semana</span>
+            <span class="metric-subtitle">Caja Real Entrada</span>
+            <div class="metric-value" id="kpi-cobrado" style="color: var(--success);">$0</div>
+        </div>
+        <div class="metric-card gastos">
+            <span class="metric-title">Esta Semana</span>
+            <span class="metric-subtitle">Gastos Semanales</span>
+            <div class="metric-value" id="kpi-gastos" style="color: var(--danger);">$0</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-title">Esta Semana</span>
+            <span class="metric-subtitle">Neto de la Semana</span>
+            <div class="metric-value" id="kpi-rentabilidad">$0</div>
+        </div>
+        <div class="metric-card deudas">
+            <span class="metric-title">En la Calle</span>
+            <span class="metric-subtitle">Total a Cobrar</span>
+            <div class="metric-value" id="kpi-deudas" style="color: var(--warning);">$0</div>
+        </div>
+    </div>
+
+    <div class="ia-panel">
+        <div class="ia-header"><i class="fa-solid fa-robot"></i> Asesoría de Negocio IA</div>
+        <div id="ia-insights-container"></div>
+    </div>
+
+    <div class="grid-main">
+        <div>
+            <div class="panel">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" id="btn-tab-auto" onclick="switchTab('auto')"><i class="fa-solid fa-car"></i> Auto</button>
+                    <button class="tab-btn" id="btn-tab-gasto" onclick="switchTab('gasto')"><i class="fa-solid fa-receipt"></i> Gasto</button>
+                    <button class="tab-btn" id="btn-tab-ajustes" onclick="switchTab('ajustes')"><i class="fa-solid fa-gear"></i> Ajustes</button>
+                </div>
+
+                <div id="form-auto">
+                    <h2>Registrar Vehículo</h2>
+                    <div class="form-group">
+                        <label>Vehículo (Modelo y Color)</label>
+                        <input type="text" id="auto-modelo" placeholder="Ej: VW Gol Negro">
+                    </div>
+                    <div class="form-group">
+                        <label>Patente / Dominio</label>
+                        <input type="text" id="auto-patente" placeholder="Ej: ABC123" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción del Trabajo</label>
+                        <textarea id="auto-descripcion" rows="2" placeholder="Ej: Pintura capot por seguro y paragolpes por fuera"></textarea>
+                    </div>
+                    
+                    <hr style="border: 0; border-top: 1px solid var(--bg-input); margin: 15px 0;">
+                    
+                    <div style="background: rgba(59, 130, 246, 0.05); padding: 8px; border-radius: 6px; border-left: 3px solid var(--primary); margin-bottom: 10px;">
+                        <div class="form-group">
+                            <label style="color: var(--primary); font-weight: bold;">Compañía de Seguro / Terceros</label>
+                            <input type="text" id="auto-seguro-nombre" placeholder="Ej: Allianz / San Cristóbal">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Presupuesto Seguro ($)</label>
+                                <input type="number" id="auto-seguro-total" value="0" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>Ya Cobrado Seguro ($)</label>
+                                <input type="number" id="auto-seguro-pagado" value="0" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(16, 185, 129, 0.05); padding: 8px; border-radius: 6px; border-left: 3px solid var(--success);">
+                        <div class="form-group">
+                            <label style="color: var(--success); font-weight: bold;">Nombre del Cliente / Dueño</label>
+                            <input type="text" id="auto-cliente-nombre" placeholder="Ej: Juan Pérez">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Franquicia / Trab. Particular ($)</label>
+                                <input type="number" id="auto-cliente-total" value="0" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>Ya Cobrado Cliente ($)</label>
+                                <input type="number" id="auto-cliente-pagado" value="0" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>¿El auto ya fue entregado?</label>
+                        <select id="auto-entrega">
+                            <option value="no">No, sigue en el Taller</option>
+                            <option value="si">Sí, ya se lo llevó el cliente</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="guardarAuto()"><i class="fa-solid fa-floppy-disk"></i> Guardar Orden Completa</button>
+                </div>
+
+                <div id="form-gasto" style="display: none;">
+                    <h2>Registrar Gasto</h2>
+                    <div class="form-group">
+                        <label>¿Qué se compró / pagó?</label>
+                        <input type="text" id="gasto-desc" placeholder="Ej: Barniz, Lijas, Boleta Luz">
+                    </div>
+                    <div class="form-group">
+                        <label>Importe ($)</label>
+                        <input type="number" id="gasto-monto" value="0" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                    </div>
+                    <div class="form-group">
+                        <label>Vincular a Auto (Opcional)</label>
+                        <select id="gasto-vinculo"></select>
+                    </div>
+                    <button class="btn-primary" onclick="guardarGasto()"><i class="fa-solid fa-file-circle-plus"></i> Guardar Gasto</button>
+                </div>
+
+                <div id="form-ajustes" style="display: none;">
+                    <h2>Administración del Taller</h2>
+                    <div class="ajustes-container">
+                        <div class="ajustes-section">
+                            <h4>Cierre de Ciclo</h4>
+                            <button class="btn-purple" onclick="cerrarSemana()"><i class="fa-solid fa-box-archive"></i> Cerrar Semana Actual</button>
+                        </div>
+                        
+                        <div class="ajustes-section" style="margin-top:15px;">
+                            <h4>Copias de Seguridad (Backup)</h4>
+                            <button class="btn-secondary" onclick="exportarRespaldo()" style="margin-bottom: 8px;"><i class="fa-solid fa-download"></i> Guardar Copia en iPhone</button>
+                            <button class="btn-secondary" onclick="document.getElementById('file-input').click()"><i class="fa-solid fa-upload"></i> Cargar Copia</button>
+                            <input type="file" id="file-input" style="display: none;" accept=".json" onchange="importarRespaldo(event)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="panel">
+                <div class="table-tabs">
+                    <button class="table-tab-btn active" id="tab-autos-taller" onclick="setFiltroAutos('taller')"><i class="fa-solid fa-car"></i> En Taller</button>
+                    <button class="table-tab-btn" id="tab-autos-entregados" onclick="setFiltroAutos('entregados')"><i class="fa-solid fa-key"></i> Con Deuda</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                               <th>Vehículo / Cuentas</th>
+                               <th>Presupuesto Total</th>
+                               <th>Cobrado Total</th>
+                               <th>Debe Total</th>
+                               <th>Gastos Mat.</th>
+                               <th>Estado</th>
+                               <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-autos"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fa-solid fa-file-invoice-dollar" style="color: var(--danger);"></i> Gastos de la Semana</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Vinculación</th>
+                                <th>Monto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gastos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel" style="margin-top: 10px;">
+        <h2>
+            <button class="toggle-btn-historial" onclick="toggleSeccionHistorial()">
+                <i id="icono-flecha-hist" class="fa-solid fa-chevron-down"></i> 📋 Historial de Autos Entregados
+            </button>
+            <span id="contador-historial" class="badge entregado" style="font-size: 0.8rem; padding: 4px 8px;">0 vehículos</span>
+        </h2>
+        
+        <div id="contenido-desplegable-historial" style="display: block; margin-top: 15px;">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="buscador-historial" placeholder="Buscar por patente, modelo, cliente..." oninput="actualizarTodo()">
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                           <th>Vehículo / Cuentas Pasadas</th>
+                           <th>Presupuesto Total</th>
+                           <th>Cobrado Total</th>
+                           <th>Debe Total</th>
+                           <th>Gastos Mat.</th>
+                           <th>Fecha Entrega</th>
+                           <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-historial-permanente"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel" style="margin-top: 10px;">
+        <h2><i class="fa-solid fa-chart-line" style="color: var(--success);"></i> 📊 Historial de Cierres y Rendimiento</h2>
+        <div style="margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; display: flex; flex-wrap: wrap; gap: 20px;">
+            <div><span style="color: var(--text-muted); font-size: 0.8rem;">Mes de Trabajo:</span> <strong id="val-mes-nombre" style="color: var(--purple); text-transform: uppercase;">-</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.8rem;">Acumulado Caja Mes:</span> <strong id="val-mes-caja" style="color: var(--success);">$0</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.8rem;">Acumulado Gastos Mes:</span> <strong id="val-mes-gastos" style="color: var(--danger);">$0</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.8rem;">NETO GANADO EN EL MES:</span> <strong id="val-mes-neto" style="white-space:nowrap; color: white; background: #2563eb; padding: 2px 6px; border-radius: 4px;">$0</strong></div>
+        </div>
+        
+        <div class="historial-grid">
+            <div>
+                <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: var(--primary);">Semanas de este Mes</h4>
+                <div class="historial-box" id="historial-semanas"></div>
+            </div>
+            <div>
+                <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: #c084fc;">Meses Históricos Guardados</h4>
+                <div class="historial-box" id="historial-meses"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-auto" class="modal">
+    <div class="modal-content">
+        <h3><i class="fa-solid fa-car"></i> Editar Vehículo y Saldos</h3>
+        <input type="hidden" id="edit-auto-index">
+        <input type="hidden" id="edit-auto-origen-historial">
+        <div class="form-group">
+            <label>Vehículo</label>
+            <input type="text" id="edit-auto-modelo">
+        </div>
+        <div class="form-group">
+            <label>Patente / Dominio</label>
+            <input type="text" id="edit-auto-patente" disabled style="opacity: 0.6;">
+        </div>
+        <div class="form-group">
+            <label>Descripción del Trabajo</label>
+            <textarea id="edit-auto-descripcion" rows="2"></textarea>
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--bg-input); margin:10px 0;">
+
+        <div style="background: rgba(59, 130, 246, 0.05); padding: 8px; border-radius:6px; margin-bottom:8px;">
+            <div class="form-group">
+                <label style="color: var(--primary);">Compañía de Seguro</label>
+                <input type="text" id="edit-auto-seguro-nombre">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Presup. Seguro ($)</label>
+                    <input type="number" id="edit-auto-seguro-total" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                </div>
+                <div class="form-group">
+                    <label>Cobrado Seg. ($)</label>
+                    <input type="number" id="edit-auto-seguro-pagado" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(16, 185, 129, 0.05); padding: 8px; border-radius:6px; margin-bottom:8px;">
+            <div class="form-group">
+                <label style="color: var(--success);">Cliente / Dueño</label>
+                <input type="text" id="edit-auto-cliente-nombre">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Franquicia / Trab. Part. ($)</label>
+                    <input type="number" id="edit-auto-cliente-total" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                </div>
+                <div class="form-group">
+                    <label>Cobrado Clie. ($)</label>
+                    <input type="number" id="edit-auto-cliente-pagado" onfocus="limpiarCero(this)" onblur="restaurarCero(this)">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Estado de Entrega</label>
+            <select id="edit-auto-entrega">
+                <option value="no">No, sigue en el Taller</option>
+                <option value="si">Sí, ya se lo llevó el cliente</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-primary" onclick="actualizarAutoGuardado()">Guardar Cambios</button>
+            <button class="btn-secondary" onclick="cerrarModal('modal-auto')">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let autos = JSON.parse(localStorage.getItem("cp_autos")) || [];
+    let histAutos = JSON.parse(localStorage.getItem("cp_hist_autos")) || [];
+    let gastos = JSON.parse(localStorage.getItem("cp_gastos")) || [];
+    let historialSemanas = JSON.parse(localStorage.getItem("cp_hist_semanas")) || [];
+    let historialMeses = JSON.parse(localStorage.getItem("cp_hist_meses")) || [];
+    let cajaSemanalEntrada = parseFloat(localStorage.getItem("cp_caja_semanal")) || 0;
+    let mesActivoTrabajo = localStorage.getItem("cp_mes_activo") || obtenerNombreMesActual();
+    let historialAbierto = localStorage.getItem("cp_historial_abierto") !== "no";
+
+    let filtroAutosActivo = 'taller';
+
+    function limpiarCero(input) { if (input.value === "0") input.value = ""; }
+    function restaurarCero(input) { if (input.value.trim() === "") input.value = "0"; }
+    function obtenerNombreMesActual() { return new Date().toLocaleString('es-AR', { month: 'long', year: 'numeric' }); }
+
+    function guardarEnStorage() {
+        localStorage.setItem("cp_autos", JSON.stringify(autos));
+        localStorage.setItem("cp_hist_autos", JSON.stringify(histAutos));
+        localStorage.setItem("cp_gastos", JSON.stringify(gastos));
+        localStorage.setItem("cp_hist_semanas", JSON.stringify(historialSemanas));
+        localStorage.setItem("cp_hist_meses", JSON.stringify(historialMeses));
+        localStorage.setItem("cp_caja_semanal", cajaSemanalEntrada);
+        localStorage.setItem("cp_mes_activo", mesActivoTrabajo);
+        localStorage.setItem("cp_historial_abierto", historialAbierto ? "si" : "no");
+    }
+
+    function toggleSeccionHistorial() {
+        historialAbierto = !historialAbierto;
+        const contenido = document.getElementById("contenido-desplegable-historial");
+        const icono = document.getElementById("icono-flecha-hist");
+        if (historialAbierto) { contenido.style.display = "block"; icono.className = "fa-solid fa-chevron-down"; } 
+        else { contenido.style.display = "none"; icono.className = "fa-solid fa-chevron-right"; }
+        guardarEnStorage();
+    }
+
+    function switchTab(tipo) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('form-auto').style.display = 'none';
+        document.getElementById('form-gasto').style.display = 'none';
+        document.getElementById('form-ajustes').style.display = 'none';
+
+        if(tipo === 'auto') { document.getElementById('form-auto').style.display = 'block'; document.getElementById('btn-tab-auto').classList.add('active'); } 
+        else if(tipo === 'gasto') { document.getElementById('form-gasto').style.display = 'block'; document.getElementById('btn-tab-gasto').classList.add('active'); cargarComboVinculos("gasto-vinculo"); } 
+        else if(tipo === 'ajustes') { document.getElementById('form-ajustes').style.display = 'block'; document.getElementById('btn-tab-ajustes').classList.add('active'); }
+    }
+
+    function setFiltroAutos(filtro) {
+        filtroAutosActivo = filtro;
+        document.getElementById('tab-autos-taller').classList.remove('active');
+        document.getElementById('tab-autos-entregados').classList.remove('active');
+        if (filtro === 'taller') document.getElementById('tab-autos-taller').classList.add('active');
+        else if (filtro === 'entregados') document.getElementById('tab-autos-entregados').classList.add('active');
+        actualizarTodo();
+    }
+
+    function cargarComboVinculos(idSelect, valorSeleccionado = "general") {
+        const combo = document.getElementById(idSelect);
+        combo.innerHTML = '<option value="general">Gasto General / Taller</option>';
+        autos.forEach(a => { combo.innerHTML += `<option value="${a.patente}" ${a.patente === valorSeleccionado ? "selected" : ""}>Auto: ${a.modelo} (${a.patente})</option>`; });
+    }
+
+    function guardarAuto() {
+        const patente = document.getElementById("auto-patente").value.trim().toUpperCase();
+        const modelo = document.getElementById("auto-modelo").value.trim();
+        const descripcion = document.getElementById("auto-descripcion").value.trim();
+        const entregado = document.getElementById("auto-entrega").value;
+        const seguroNombre = document.getElementById("auto-seguro-nombre").value.trim();
+        const seguroTotal = parseFloat(document.getElementById("auto-seguro-total").value) || 0;
+        const seguroPagado = parseFloat(document.getElementById("auto-seguro-pagado").value) || 0;
+        const clienteNombre = document.getElementById("auto-cliente-nombre").value.trim() || "Particular";
+        const clienteTotal = parseFloat(document.getElementById("auto-cliente-total").value) || 0;
+        const clientePagado = parseFloat(document.getElementById("auto-cliente-pagado").value) || 0;
+
+        if(!patente || (seguroTotal === 0 && clienteTotal === 0)) { alert("Ingresá patente y al menos un presupuesto."); return; }
+
+        const index = autos.findIndex(a => a.patente === patente);
+        const fechaEntrega = entregado === 'si' ? new Date().toISOString().split('T')[0] : null;
+        
+        if(index > -1) {
+            const diffSeguro = seguroPagado - autos[index].seguroPagado;
+            const diffCliente = clientePagado - autos[index].clientePagado;
+            if(diffSeguro > 0) cajaSemanalEntrada += diffSeguro;
+            if(diffCliente > 0) cajaSemanalEntrada += diffCliente;
+            autos[index] = { patente, modelo, descripcion, entregado, seguroNombre, seguroTotal, seguroPagado, clienteNombre, clienteTotal, clientePagado, fechaEntrega: entregado === 'si' ? (autos[index].fechaEntrega || fechaEntrega) : null };
+        } else {
+            cajaSemanalEntrada += (seguroPagado + clientePagado);
+            autos.push({ patente, modelo, descripcion, entregado, seguroNombre, seguroTotal, seguroPagado, clienteNombre, clienteTotal, clientePagado, fechaEntrega });
+        }
+        guardarEnStorage();
+        document.getElementById("auto-patente").value = ""; document.getElementById("auto-modelo").value = ""; document.getElementById("auto-descripcion").value = ""; 
+        document.getElementById("auto-seguro-nombre").value = ""; document.getElementById("auto-seguro-total").value = "0"; document.getElementById("auto-seguro-pagado").value = "0";
+        document.getElementById("auto-cliente-nombre").value = ""; document.getElementById("auto-cliente-total").value = "0"; document.getElementById("auto-cliente-pagado").value = "0";
+        actualizarTodo();
+    }
+
+    function guardarGasto() {
+        const desc = document.getElementById("gasto-desc").value.trim();
+        const monto = parseFloat(document.getElementById("gasto-monto").value) || 0;
+        const vinculo = document.getElementById("gasto-vinculo").value;
+        if(!desc || monto <= 0) { alert("Completá gasto válido."); return; }
+        gastos.push({ id: Date.now(), desc, monto, vinculo });
+        guardarEnStorage();
+        document.getElementById("gasto-desc").value = ""; document.getElementById("gasto-monto").value = "0";
+        actualizarTodo();
+    }
+
+    function abrirEditarAuto(patente, desdeHistorial = false) {
+        let lista = desdeHistorial ? histAutos : autos;
+        const index = lista.findIndex(a => a.patente === patente);
+        if (index === -1) return;
+        const auto = lista[index];
+        
+        document.getElementById("edit-auto-index").value = index;
+        document.getElementById("edit-auto-origen-historial").value = desdeHistorial ? "si" : "no";
+        document.getElementById("edit-auto-patente").value = auto.patente;
+        document.getElementById("edit-auto-modelo").value = auto.modelo;
+        document.getElementById("edit-auto-descripcion").value = auto.descripcion || "";
+        document.getElementById("edit-auto-seguro-nombre").value = auto.seguroNombre || "";
+        document.getElementById("edit-auto-seguro-total").value = auto.seguroTotal || 0;
+        document.getElementById("edit-auto-seguro-pagado").value = auto.seguroPagado || 0;
+        document.getElementById("edit-auto-cliente-nombre").value = auto.clienteNombre || "Particular";
+        document.getElementById("edit-auto-cliente-total").value = auto.clienteTotal || 0;
+        document.getElementById("edit-auto-cliente-pagado").value = auto.clientePagado || 0;
+        document.getElementById("edit-auto-entrega").value = auto.entregado || "no";
+        document.getElementById("modal-auto").style.display = "flex";
+    }
+
+    function actualizarAutoGuardado() {
+        const index = document.getElementById("edit-auto-index").value;
+        const esHistorial = document.getElementById("edit-auto-origen-historial").value === "si";
+        let lista = esHistorial ? histAutos : autos;
+        const nuevoEntrega = document.getElementById("edit-auto-entrega").value;
+        const segPagado = parseFloat(document.getElementById("edit-auto-seguro-pagado").value) || 0;
+        const cliePagado = parseFloat(document.getElementById("edit-auto-cliente-pagado").value) || 0;
+        
+        if(!esHistorial) {
+            const diffSeguro = segPagado - lista[index].seguroPagado;
+            const diffCliente = cliePagado - lista[index].clientePagado;
+            if(diffSeguro > 0) cajaSemanalEntrada += diffSeguro;
+            if(diffCliente > 0) cajaSemanalEntrada += diffCliente;
+        }
+
+        lista[index].modelo = document.getElementById("edit-auto-modelo").value.trim();
+        lista[index].descripcion = document.getElementById("edit-auto-descripcion").value.trim();
+        lista[index].seguroNombre = document.getElementById("edit-auto-seguro-nombre").value.trim();
+        lista[index].seguroTotal = parseFloat(document.getElementById("edit-auto-seguro-total").value) || 0;
+        lista[index].seguroPagado = segPagado;
+        lista[index].clienteNombre = document.getElementById("edit-auto-cliente-nombre").value.trim();
+        lista[index].clienteTotal = parseFloat(document.getElementById("edit-auto-cliente-total").value) || 0;
+        lista[index].clientePagado = cliePagado;
+
+        if (nuevoEntrega === 'si' && lista[index].entregado !== 'si') { lista[index].fechaEntrega = new Date().toISOString().split('T')[0]; } 
+        else if (nuevoEntrega === 'no') { lista[index].fechaEntrega = null; }
+        lista[index].entregado = nuevoEntrega;
+
+        if(esHistorial && nuevoEntrega === 'no') { autos.push(lista[index]); histAutos.splice(index, 1); }
+        guardarEnStorage(); cerrarModal('modal-auto'); actualizarTodo();
+    }
+
+    function cobroRapidoEspecifico(patente, tipo, esHistorial = false) {
+        let lista = esHistorial ? histAutos : autos;
+        const auto = lista.find(a => a.patente === patente);
+        if(!auto) return;
+
+        if (tipo === 'seguro') {
+            const saldo = auto.seguroTotal - auto.seguroPagado;
+            const cobro = parseFloat(prompt(`COBRO SEGURO (${auto.seguroNombre})\nSaldo pendiente: $${saldo.toLocaleString()}.\n¿Cuánto entra?`, saldo));
+            if(!isNaN(cobro) && cobro > 0) { auto.seguroPagado += cobro; if(!esHistorial) cajaSemanalEntrada += cobro; }
+        } else {
+            const saldo = auto.clienteTotal - auto.clientePagado;
+            const cobro = parseFloat(prompt(`COBRO CLIENTE (${auto.clienteNombre})\nSaldo pendiente: $${saldo.toLocaleString()}.\n¿Cuánto entra?`, saldo));
+            if(!isNaN(cobro) && cobro > 0) { auto.clientePagado += cobro; if(!esHistorial) cajaSemanalEntrada += cobro; }
+        }
+        guardarEnStorage(); actualizarTodo();
+    }
+
+    function liquidarTodoAuto(patente, esHistorial = false) {
+        let lista = esHistorial ? histAutos : autos;
+        const auto = lista.find(a => a.patente === patente);
+        if(!auto) return;
+        const deSeguro = auto.seguroTotal - auto.seguroPagado;
+        const deCliente = auto.clienteTotal - auto.clientePagado;
+        const deudaTotalAuto = deSeguro + deCliente;
+
+        if(deudaTotalAuto <= 0) return;
+        if(confirm(`¿Liquidar TODO el saldo de este auto?\n💰 Total: $${deudaTotalAuto.toLocaleString()}`)) {
+            if(deSeguro > 0) auto.seguroPagado = auto.seguroTotal;
+            if(deCliente > 0) auto.clientePagado = auto.clienteTotal;
+            if(!esHistorial) cajaSemanalEntrada += deudaTotalAuto;
+            guardarEnStorage(); actualizarTodo();
+        }
+    }
+
+    function calcularDiasDeuda(fechaEntregaStr) {
+        if (!fechaEntregaStr) return null;
+        const fEntrega = new Date(fechaEntregaStr + "T00:00:00");
+        const fHoy = new Date(); fHoy.setHours(0,0,0,0);
+        const difDias = Math.floor((fHoy.getTime() - fEntrega.getTime()) / (1000 * 60 * 60 * 24));
+        return difDias < 0 ? 0 : difDias;
+    }
+
+    function cerrarModal(idModal) { document.getElementById(idModal).style.display = "none"; }
+    function eliminarAuto(patente, esHistorial = false) { if(confirm(`¿Borrar definitivamente ${patente}?`)) { if(esHistorial) histAutos = histAutos.filter(a => a.patente !== patente); else autos = autos.filter(a => a.patente !== patente); guardarEnStorage(); actualizarTodo(); } }
+    function eliminarGasto(id) { if(confirm("¿Eliminar gasto?")) { gastos = gastos.filter(g => g.id !== id); guardarEnStorage(); actualizarTodo(); } }
+    function borrarSemanaHistorial(idTiempo) { if(confirm("¿Borrar semana?")) { historialSemanas = historialSemanas.filter(s => s.id !== idTiempo); guardarEnStorage(); actualizarTodo(); } }
+
+    function cerrarSemana() {
+        const mesCalendarioHoy = obtenerNombreMesActual();
+        let totalGastosSemana = gastos.reduce((acc, g) => acc + g.monto, 0);
+        let netoSemanal = cajaSemanalEntrada - totalGastosSemana;
+        let autosPagadosEnTaller = autos.filter(a => ((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado)) <= 0 && a.entregado !== 'si');
+
+        if (autosPagadosEnTaller.length > 0) {
+            let patentesLista = autosPagadosEnTaller.map(a => `${a.modelo} (${a.patente})`).join("\n• ");
+            let conservar = confirm(`⚠️ AUTOS PAGADOS EN EL TALLER:\n\n• ${patentesLista}\n\n¿Querés dejar estos autos VISIBLES en el taller?\n\n[Aceptar] = Dejar en taller.\n[Cancelar] = Archivarlos al historial.`);
+            if (conservar) { autosPagadosEnTaller.forEach(a => a._conservarEnTaller = true); }
+        }
+
+        if (mesActivoTrabajo !== mesCalendarioHoy && historialSemanas.length > 0) {
+            let mesCaja = historialSemanas.reduce((acc, s) => acc + s.ingresos, 0);
+            let mesGastos = historialSemanas.reduce((acc, s) => acc + s.gastos, 0);
+            historialMeses.push({ mes: historialMeses.length + 1, fecha: mesActivoTrabajo, ingresos: mesCaja, gastos: mesGastos, neto: (mesCaja - mesGastos) });
+            historialSemanas = []; mesActivoTrabajo = mesCalendarioHoy;
+        }
+
+        if(confirm(`--- CIERRE SEMANAL ---\n• Caja Entró: $${cajaSemanalEntrada.toLocaleString()}\n• Gastos: $${totalGastosSemana.toLocaleString()}\n\n¿Confirmar cierre?`)) {
+            historialSemanas.push({ id: Date.now(), fecha: new Date().toLocaleDateString(), ingresos: cajaSemanalEntrada, gastos: totalGastosSemana, neto: netoSemanal });
+            let nuevosActivos = [];
+            autos.forEach(a => {
+                const deuda = (a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado);
+                if (deuda > 0) { nuevosActivos.push(a); } 
+                else if (a.entregado === 'si' || !a._conservarEnTaller) { if(!a.fechaEntrega) a.fechaEntrega = new Date().toISOString().split('T')[0]; a.entregado = 'si'; histAutos.push(a); } 
+                else { delete a._conservarEnTaller; nuevosActivos.push(a); }
+            });
+            autos = nuevosActivos; gastos = []; cajaSemanalEntrada = 0; mesActivoTrabajo = mesCalendarioHoy;
+            guardarEnStorage(); actualizarTodo(); switchTab('auto');
+        }
+    }
+
+    function exportarRespaldo() {
+        const dataStr = JSON.stringify({ autos, histAutos, gastos, historialSemanas, historialMeses, cajaSemanalEntrada, mesActivoTrabajo });
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', 'backup_taller_' + new Date().toISOString().slice(0,10) + '.json');
+        linkElement.click();
+    }
+
+    function importarRespaldo(event) {
+        const input = event.target;
+        const reader = new FileReader();
+        reader.onload = function() {
+            try {
+                const data = JSON.parse(reader.result);
+                autos = data.autos || []; histAutos = data.histAutos || []; gastos = data.gastos || [];
+                historialSemanas = data.historialSemanas || []; historialMeses = data.historialMeses || [];
+                cajaSemanalEntrada = data.cajaSemanalEntrada || 0; mesActivoTrabajo = data.mesActivoTrabajo || obtenerNombreMesActual();
+                guardarEnStorage(); actualizarTodo(); alert("Respaldo cargado con éxito.");
+            } catch (e) { alert("Archivo inválido."); }
+        };
+        if(input.files[0]) reader.readAsText(input.files[0]);
+    }
+
+    function construirFilaAuto(a, totalGastosMaterial, esHistorial = false) {
+        const deSeguro = a.seguroTotal - a.seguroPagado;
+        const deCliente = a.clienteTotal - a.clientePagado;
+        const deudaTotalAuto = deSeguro + deCliente;
+        const isEntregado = a.entregado === 'si';
+
+        let bClass = 'debe'; let bText = 'Debe Todo';
+        const comedy = a.seguroTotal + a.clienteTotal;
+        const sumaCobrados = a.seguroPagado + a.clientePagado;
+
+        if (deudaTotalAuto <= 0) { bClass = 'pagado'; bText = 'Pagado'; }
+        else if (sumaCobrados > 0) { bClass = 'parcial'; bText = 'Con Saldo'; }
+        
+        let ubiClass = isEntregado ? 'badge entregado' : 'badge debe';
+        let ubiText = isEntregado ? 'Entregado' : 'En Taller';
+
+        let textoDiasDeuda = "";
+        if (isEntregado && deudaTotalAuto > 0) {
+            const dias = calcularDiasDeuda(a.fechaEntrega);
+            if (dias !== null) textoDiasDeuda = `<span class="badge debe" style="margin-top:4px; background:rgba(239,68,68,0.25); color:#f87171;"><i class="fa-solid fa-clock"></i> Hace ${dias} ${dias === 1 ? 'día' : 'días'}</span>`;
+        } else if (esHistorial && a.fechaEntrega) {
+            textoDiasDeuda = `<span class="badge entregado" style="margin-top:4px; font-size:0.7rem;"><i class="fa-solid fa-calendar-check"></i> ${a.fechaEntrega}</span>`;
+        }
+
+        let bloqueSeguro = a.seguroTotal > 0 ? `
+            <div style="font-size:0.75rem; background:rgba(59,130,246,0.1); padding:4px; border-radius:4px; margin-top:5px;">
+                <span style="color:#60a5fa; font-weight:bold;">🏛️ ${a.seguroNombre || 'Seguro'}:</span> $${a.seguroTotal.toLocaleString()} | Cobrado: <span style="color:var(--success)">$${a.seguroPagado.toLocaleString()}</span>
+                ${deSeguro > 0 ? `<br><button class="btn-mini-cobro" onclick="cobroRapidoEspecifico('${a.patente}', 'seguro', ${esHistorial})"><i class="fa-solid fa-money-bill-wave"></i> Cobrar (Resta $${deSeguro.toLocaleString()})</button>` : '<br><span style="color:var(--success); font-size:0.7rem;">✔ Seguro Liquidado</span>'}
+            </div>` : "";
+
+        let bloqueCliente = (a.clienteTotal > 0 || !a.seguroTotal) ? `
+            <div style="font-size:0.75rem; background:rgba(16,185,129,0.1); padding:4px; border-radius:4px; margin-top:4px;">
+                <span style="color:#34d399; font-weight:bold;">👤 ${a.clienteNombre || 'Cliente'}:</span> $${a.clienteTotal.toLocaleString()} | Cobrado: <span style="color:var(--success)">$${a.clientePagado.toLocaleString()}</span>
+                ${deCliente > 0 ? `<br><button class="btn-mini-cobro" onclick="cobroRapidoEspecifico('${a.patente}', 'cliente', ${esHistorial})"><i class="fa-solid fa-user-check"></i> Cobrar (Resta $${deCliente.toLocaleString()})</button>` : '<br><span style="color:var(--success); font-size:0.7rem;">✔ Cliente Liquidado</span>'}
+            </div>` : "";
+
+        return `
+            <tr>
+                <td>
+                    <strong style="font-size:1.05rem; color:#fff;">${a.modelo || 'Sin Modelo'}</strong><br>
+                    <span style="color:var(--primary); font-weight:bold; font-size:0.8rem; background:rgba(59,130,246,0.1); padding:1px 5px; border-radius:3px; display:inline-block; margin: 3px 0;">${a.patente}</span>
+                    ${bloqueSeguro} ${bloqueCliente}
+                    <span style="color:var(--text-muted); font-size:0.75rem; display:block; font-style:italic; margin-top:5px; border-top:1px dashed #334155; padding-top:3px;">${a.descripcion || 'Sin descripción'}</span>
+                </td>
+                <td><strong>$${comedy.toLocaleString()}</strong></td>
+                <td style="color: var(--success)"><strong>$${sumaCobrados.toLocaleString()}</strong></td>
+                <td style="color:var(--warning)"><strong>$${deudaTotalAuto.toLocaleString()}</strong></td>
+                <td>$${totalGastosMaterial.toLocaleString()}</td>
+                <td>${esHistorial ? textoDiasDeuda : `<span class="${ubiClass}">${ubiText}</span><br><span class="badge ${bClass}" style="margin-top:4px;">${bText}</span>${textoDiasDeuda}`}</td>
+                <td>
+                    <div class="action-container"><div class="action-row">
+                        ${deudaTotalAuto > 0 ? `<button class="action-btn payall" onclick="liquidarTodoAuto('${a.patente}', ${esHistorial})"><i class="fa-solid fa-money-bill-check" style="color:var(--success)"></i></button>` : ''}
+                        ${!isEntregado ? `<button class="action-btn" onclick="entregarAutoRapido('${a.patente}')"><i class="fa-solid fa-key" style="color:var(--purple)"></i></button>` : ''}
+                        <button class="action-btn" onclick="abrirEditarAuto('${a.patente}', ${esHistorial})"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="action-btn del" onclick="eliminarAuto('${a.patente}', ${esHistorial})"><i class="fa-solid fa-trash"></i></button>
+                    </div></div>
+                </td>
+            </tr>`;
+    }
+
+    function entregarAutoRapido(patente) {
+        const auto = autos.find(a => a.patente === patente);
+        if(!auto) return;
+        if (confirm(`¿Marcar patente ${patente} como ENTREGADO?`)) { auto.entregado = "si"; auto.fechaEntrega = new Date().toISOString().split('T')[0]; guardarEnStorage(); actualizarTodo(); }
+    }
+
+    function actualizarTodo() {
+        const tAutos = document.getElementById("tabla-autos"); tAutos.innerHTML = "";
+        let totalDeudasCalle = 0;
+        autos.forEach(a => {
+            if (a.entregado === "si" && ((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado)) > 0) {
+                totalDeudasCalle += ((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado));
+            }
+        });
+        if (filtroAutosActivo === 'taller') {
+            autos.forEach(a => {
+                if (a.entregado === 'si') return;
+                const mat = gastos.filter(g => g.vinculo === a.patente).reduce((acc, curr) => acc + curr.monto, 0);
+                tAutos.innerHTML += construirFilaAuto(a, mat, false);
+            });
+            if(tAutos.innerHTML === "") tAutos.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No hay autos físicos en el taller.</td></tr>';
+        } else {
+            let entregadosDeuda = autos.filter(a => a.entregado === 'si' && (((a.seguroTotal - a.seguroPagado) + (a.clienteTotal - a.clientePagado)) > 0));
+            let deudoresAgrupados = {};
+            entregadosDeuda.forEach(a => {
+                let llave = (a.seguroTotal - a.seguroPagado) > 0 ? `SEGURO: ${a.seguroNombre.toUpperCase()}` : `CLIENTE: ${a.clienteNombre.toUpperCase()}`;
+                if (!deudoresAgrupados[llave]) deudoresAgrupados[llave] = [];
+                deudoresAgrupados[llave].push(a);
+            });
+            for (let grupo in deudoresAgrupados) {
+                tAutos.innerHTML += `<tr class="group-header-row"><td colspan="7" class="group-header-text"><i class="fa-solid fa-folder-open"></i> ${grupo} (${deudoresAgrupados[grupo].length})</td></tr>`;
+                deudoresAgrupados[grupo].forEach(a => {
+                    const mat = gastos.filter(g => g.vinculo === a.patente).reduce((acc, curr) => acc + curr.monto, 0);
+                    tAutos.innerHTML += construirFilaAuto(a, mat, false);
+                });
+            }
+            if (entregadosDeuda.length === 0) tAutos.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No hay vehículos con deuda.</td></tr>';
+        }
+
+        document.getElementById("contador-historial").innerText = `${histAutos.length} vehículos`;
+        const tHistorial = document.getElementById("tabla-historial-permanente"); tHistorial.innerHTML = "";
+        const textoBusqueda = document.getElementById("buscador-historial").value.toLowerCase().trim();
+        let copiaHistorial = [...histAutos].sort((a,b) => new Date(b.fechaEntrega) - new Date(a.fechaEntrega));
+
+        if (textoBusqueda !== "") {
+            copiaHistorial = copiaHistorial.filter(a => a.patente.toLowerCase().includes(textoBusqueda) || a.modelo.toLowerCase().includes(textoBusqueda) || a.clienteNombre.toLowerCase().includes(textoBusqueda));
+        }
+        copiaHistorial.forEach(a => { tHistorial.innerHTML += construirFilaAuto(a, 0, true); });
+        if (copiaHistorial.length === 0) tHistorial.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">Sin resultados.</td></tr>';
+
+        const tGastos = document.getElementById("tabla-gastos"); tGastos.innerHTML = "";
+        let totalGastosSemana = 0;
+        gastos.forEach(g => {
+            totalGastosSemana += g.monto;
+            tGastos.innerHTML += `<tr><td>${g.desc}</td><td style="color:var(--text-muted)">${g.vinculo === 'general' ? 'Gasto General' : `Auto: ${g.vinculo}`}</td><td style="color:var(--danger)">$${g.monto.toLocaleString()}</td><td><button class="action-btn del" onclick="eliminarGasto(${g.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+        });
+
+        let netoSemanal = cajaSemanalEntrada - totalGastosSemana;
+        document.getElementById("kpi-cobrado").innerText = "$" + cajaSemanalEntrada.toLocaleString();
+        document.getElementById("kpi-gastos").innerText = "$" + totalGastosSemana.toLocaleString();
+        document.getElementById("kpi-deudas").innerText = "$" + totalDeudasCalle.toLocaleString();
+        const rentSemana = document.getElementById("kpi-rentabilidad"); rentSemana.innerText = (netoSemanal < 0 ? "-" : "") + "$" + Math.abs(netoSemanal).toLocaleString();
+        rentSemana.style.color = netoSemanal >= 0 ? "var(--success)" : "var(--danger)";
+
+        document.getElementById("val-mes-nombre").innerText = mesActivoTrabajo;
+        let acMesCaja = historialSemanas.reduce((acc, s) => acc + s.ingresos, 0);
+        let acMesGastos = historialSemanas.reduce((acc, s) => acc + s.gastos, 0);
+        document.getElementById("val-mes-caja").innerText = "$" + acMesCaja.toLocaleString();
+        document.getElementById("val-mes-gastos").innerText = "$" + acMesGastos.toLocaleString();
+        document.getElementById("val-mes-neto").innerText = "$" + (acMesCaja - acMesGastos).toLocaleString();
+
+        const boxSemanas = document.getElementById("historial-semanas");
+        if(historialSemanas.length === 0) boxSemanas.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; padding:10px;">Sin cierres.</div>';
+        else {
+            boxSemanas.innerHTML = "";
+            historialSemanas.forEach((s, i) => { boxSemanas.innerHTML += `<div class="historial-item"><span><strong>Semana ${i + 1}</strong> (${s.fecha}) - Neto: <strong style="color:var(--success)">$${s.neto.toLocaleString()}</strong></span><button class="action-btn del" onclick="borrarSemanaHistorial(${s.id})"><i class="fa-solid fa-trash" style="color:var(--danger)"></i></button></div>`; });
+        }
+
+        const boxMeses = document.getElementById("historial-meses");
+        if(historialMeses.length === 0) boxMeses.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; padding:10px;">Sin meses archivados.</div>';
+        else { boxMeses.innerHTML = ""; historialMeses.forEach(m => { boxMeses.innerHTML += `<div class="historial-item"><span style="text-transform:capitalize;"><strong>${m.fecha}</strong></span><span>Neto: <strong style="color:var(--primary)">$${m.neto.toLocaleString()}</strong></span></div>`; }); }
+
+        const iaBox = document.getElementById("ia-insights-container"); iaBox.innerHTML = "";
+        if (totalDeudasCalle > acMesCaja && totalDeudasCalle > 0) iaBox.innerHTML += `<div class="ia-insight"><i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i> <strong>Alerta:</strong> Tenés más plata en la calle que cobrada.</div>`;
+        if (iaBox.innerHTML === "") iaBox.innerHTML = `<div class="ia-insight"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i> Datos estables.</div>`;
+    }
+
+    if (historialAbierto) { document.getElementById("contenido-desplegable-historial").style.display = "block"; document.getElementById("icono-flecha-hist").className = "fa-solid fa-chevron-down"; }
+    else { document.getElementById("contenido-desplegable-historial").style.display = "none"; document.getElementById("icono-flecha-hist").className = "fa-solid fa-chevron-right"; }
+    actualizarTodo();
+</script>
+</body>
+</html>
